@@ -1,0 +1,5 @@
+- snort_rule:
+    rule: "{{ ids_rule }}"
+    state: "{{ ids_rule_state }}"
+    rules_file: "{{ ids_rules_file }}"
+  notify: restart snort
