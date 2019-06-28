@@ -1,3 +1,4 @@
+---
 - snort_rule:
     rule: "{{ ids_rule }}"
     state: "{{ ids_rule_state }}"
