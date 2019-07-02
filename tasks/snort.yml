@@ -1,5 +1,5 @@
 - snort_rule:
     rule: "{{ ids_rule }}"
     state: "{{ ids_rule_state }}"
-    rules_file: "{{ ids_rules_file }}"
+    rules_file: "{{ ids_rules_file|default('/etc/snort/rules/local.rules'}}"
   notify: restart snort

@@ -21,59 +21,53 @@ Role Variables
 --------------
 
 * `ids_provider` - This defines what IDS provider (Default Value: "snort")
-* `ids_install_normalize_logs` - Set to True to setup log normalization
-  (Default Value: True)
-
-## snort
-
-For the Snort provider you will need to set the `ids_provider` variable
-as such:
-
-    vars:
-      ids_provider: snort
-
-When `ids_install_normalize_logs` is set, the role will also install
-[barnyard2](https://github.com/firnsy/barnyard2) in service of normalizing the
-snort logs.
-
-All other `ids_install_*` variables will be namespaced to the specific provider.
-
-### snort variables
-
-* `ids_provider` - Default value: `"snort"`
-* `ids_install_snort_interface` - Default value: `eth0`
-* `ids_install_snort_version` - Default value: `2.9.12`
-* `ids_install_snort_daq_version` - Default value: `2.0.6`
-* `ids_install_snort_rulesversion` - Default value: `29120`
-* `ids_install_snort_promiscuous_interface` - Default value: `False`
-* `ids_install_snort_logdir` - Default value: `"/var/log/snort"`
-* `ids_install_snort_logfile` - Default value: `"snort.log"`
-* `ids_install_snort_config_path` - Default value: `"/etc/snort/snort.conf"`
-
+* `ids_rule` - The rule you would like to add or remove to/from managed set of
+   rules
+* `ids_rule_state` - Should be one of `present` or `absent`
+* `ids_rules_file` - The rules file the manage (default:
+  `/etc/snort/rules/local.rules`)
 
 Dependencies
 ------------
 
-* `geerlingguy.repo-epel`
+Dependencies will vary by provider
+
+## snort Dependencies
+
+* [
 
 
 Example Playbook
 ----------------
 
-    - name: configure snort
+    - name: manage snort rules
       hosts: idshosts
+      become: yes
+      become_user: root
+      gather_facts: false
+
       vars:
-          ids_provider: "snort"
-          ids_install_normalize_logs: True
+        ids_provider: snort
+        protocol: tcp
+        source_port: any
+        source_ip: any
+        dest_port: any
+        dest_ip: any
+
       tasks:
-        - name: import ids_install role
-          import_role:
-            name: "ids_install"
+        - name: Add snort password attack rule
+          include_role:
+            name: "ids_rule"
+          vars:
+            ids_rule: 'alert {{protocol}} {{source_ip}} {{source_port}} -> {{dest_ip}} {{dest_port}}  (msg:"Attempted /etc/passwd Attack"; uricontent:"/etc/passwd"; classtype:attempted-user; sid:99000004; priority:1; rev:1;)'
+            ids_rules_file: '/etc/snort/rules/local.rules'
+            ids_rule_state: present
+
 
 License
 -------
 
-BSD
+GPLv3
 
 Author Information
 ------------------
