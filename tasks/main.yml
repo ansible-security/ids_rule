@@ -8,7 +8,9 @@
 
 - name: ensure ids_provider is valid
   fail:
-    msg: "Provided value for 'ids_provider' is not valid, must be one of {{ ids_provider_list }}"
+    msg: >
+      Provided value for 'ids_provider' is not valid, must be one of
+      {{ ids_provider_list }}
   when: ids_provider not in ids_provider_list
 
 - name: verify required variable ids_rule is defined

@@ -1,0 +1,51 @@
+---
+- name: Converge
+  hosts: all
+  vars:
+    ids_provider: "snort"
+    ids_config_provider: "snort"
+    ids_config_remote_log: true
+    ids_config_remote_log_destination: 10.4.1.4
+    ids_config_remote_log_procotol: udp
+    ids_install_normalize_logs: false
+    protocol: tcp
+    source_port: any
+    source_ip: any
+    dest_port: any
+    dest_ip: any
+
+  tasks:
+    - name: import the geerlingguy.repo-epel
+      import_role:
+        name: "geerlingguy.repo-epel"
+
+    - name: import the ids_install role
+      import_role:
+        name: "ansible_security.ids_install"
+
+    - name: import the ids_config role
+      import_role:
+        name: "ansible_security.ids_config"
+
+    - name: install python-idstools
+      yum:
+        name: python-idstools
+        state: present
+
+    - name: Add snort password attack rule (multi-line)
+      include_role:
+        name: "ids_rule"
+      vars:
+        ids_rule: >-
+          alert {{ protocol }} {{ source_ip }} {{ source_port }} ->
+          {{ dest_ip }} {{ dest_port }}
+          (
+          msg:"Attempted DDoS Attack";
+          uricontent:"/ddos_simulation";
+          classtype:successful-dos;
+          sid:99000010;
+          priority:1;
+          rev:1;
+          )'
+        ids_rules_file: '/etc/snort/rules/local.rules'
+        ids_rule_state: present
