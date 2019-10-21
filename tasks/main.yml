@@ -1,7 +1,7 @@
 ---
 # tasks file for ids_rule
 
-- name: verify required variable is defined
+- name: verify required variable ids_provider is defined
   fail:
     msg: "Required variable 'ids_provider' is not defined"
   when: ids_provider is not defined
@@ -10,6 +10,16 @@
   fail:
     msg: "Provided value for 'ids_provider' is not valid, must be one of {{ ids_provider_list }}"
   when: ids_provider not in ids_provider_list
+
+- name: verify required variable ids_rule is defined
+  fail:
+    msg: "Required variable 'ids_rule' is not defined"
+  when: ids_rule is not defined
+
+- name: verify required variable ids_rule_state is defined
+  fail:
+    msg: "Required variable 'ids_rule_state' is not defined"
+  when: ids_rule_state is not defined
 
 - name: include ids_provider tasks
   include_tasks: "{{ ids_provider }}.yml"
